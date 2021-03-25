@@ -1,28 +1,30 @@
 const express = require("express");
-const morgan = require('morgan');
+const morgan = require("morgan");
+const cookieParser = require("cookie-parser");
+
 const routes = require("./routes");
 
 const app = express();
 
 app.set("view engine", "pug");
-
-app.use(morgan('dev'));
+app.use(morgan("dev"));
+app.use(cookieParser());
+app.use(express.urlencoded({ extended: false }));
 app.use(routes);
 
 app.use((req, res, next) => {
-    const err = new Error('The requested page couldn\'t be found.');
-    err.status = 404;
-    next(err);
-})
+  const err = new Error("The requested page couldn't be found.");
+  err.status = 404;
+  next(err);
+});
 
 app.use((err, req, res, next) => {
-    if (process.env.NODE_ENV === 'production') {
-
-    } else {
-        console.error(err);
-    }
-    next(err);
-})
+  if (process.env.NODE_ENV === "production") {
+  } else {
+    console.error(err);
+  }
+  next(err);
+});
 
 app.use((err, req, res, next) => {
   if (err.status === 404) {
@@ -34,7 +36,6 @@ app.use((err, req, res, next) => {
     next(err);
   }
 });
-
 
 app.use((err, req, res, next) => {
   res.status(err.status || 500);
